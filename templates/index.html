@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario's Pizza & Pasta</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 20px; padding-bottom: 180px; }
+        .section { margin-bottom: 30px; }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f44336;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .menu-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        .item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        .item-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin: 0 15px;
+        }
+        .add-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .add-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        .cart {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            display: none;
+            z-index: 1000;
+        }
+        .cart.active { display: block; }
+        .cart-items {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .cart-total {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #d32f2f;
+            margin: 15px 0;
+        }
+        .checkout-btn {
+            width: 100%;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .checkout-btn:hover { background: #b71c1c; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #d32f2f;
+        }
+        .submit-btn {
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .confirmation {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .confirmation.active { display: block; }
+        .confirmation h2 {
+            color: #4CAF50;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        .order-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍕 Mario's Pizza & Pasta</h1>
+            <p>Scan QR Code, Order & Enjoy!</p>
+        </div>
+        
+        <div class="content" id="menuContent">
+            <div class="section">
+                <div class="section-title">🍕 Pizzas</div>
+                <div id="pizzaMenu"></div>
+            </div>
+            <div class="section">
+                <div class="section-title">🍝 Pasta</div>
+                <div id="pastaMenu"></div>
+            </div>
+            <div class="section">
+                <div class="section-title">🥤 Drinks</div>
+                <div id="drinksMenu"></div>
+            </div>
+        </div>
+        
+        <div class="confirmation" id="confirmation">
+            <h2>✅ Order Confirmed!</h2>
+            <div class="order-details" id="orderDetails"></div>
+            <p style="color: #666;">Your food will arrive at your table shortly!</p>
+        </div>
+    </div>
+    
+    <div class="cart" id="cart">
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-total" id="cartTotal">Total: $0</div>
+        <button class="checkout-btn" onclick="showCheckout()">Checkout</button>
+    </div>
+    
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">Complete Your Order</h2>
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label>Table Number *</label>
+                    <input type="number" id="tableNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="customerPhone" required>
+                </div>
+                <button type="submit" class="submit-btn">Place Order</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let cart = [];
+        let menu = {};
+        
+        fetch('/api/menu')
+            .then(r => r.json())
+            .then(data => {
+                menu = data;
+                displayMenu();
+            });
+        
+        function displayMenu() {
+            ['pizzas', 'pasta', 'drinks'].forEach(category => {
+                const container = document.getElementById(category === 'pizzas' ? 'pizzaMenu' : category === 'pasta' ? 'pastaMenu' : 'drinksMenu');
+                menu[category].forEach(item => {
+                    container.innerHTML += `
+                        <div class="menu-item">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-price">$${item.price}</div>
+                            <button class="add-btn" onclick='addToCart(${JSON.stringify(item)})'>Add</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+        
+        function addToCart(item) {
+            cart.push(item);
+            updateCart();
+        }
+        
+        function updateCart() {
+            const cartDiv = document.getElementById('cart');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            if (cart.length === 0) {
+                cartDiv.classList.remove('active');
+                return;
+            }
+            
+            cartDiv.classList.add('active');
+            cartItems.innerHTML = '';
+            let total = 0;
+            
+            cart.forEach(item => {
+                total += item.price;
+                cartItems.innerHTML += `
+                    <div class="cart-item">
+                        <span>${item.name}</span>
+                        <span>$${item.price}</span>
+                    </div>
+                `;
+            });
+            
+            cartTotal.textContent = `Total: $${total}`;
+        }
+        
+        function showCheckout() {
+            document.getElementById('checkoutModal').classList.add('active');
+        }
+        
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const orderData = {
+                table: document.getElementById('tableNumber').value,
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                items: cart,
+                total: cart.reduce((sum, item) => sum + item.price, 0)
+            };
+            
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(orderData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                document.getElementById('checkoutModal').classList.remove('active');
+                document.getElementById('menuContent').style.display = 'none';
+                document.getElementById('cart').style.display = 'none';
+                
+                const confirmation = document.getElementById('confirmation');
+                const orderDetails = document.getElementById('orderDetails');
+                
+                orderDetails.innerHTML = `
+                    <p><strong>Order #:</strong> ${result.order_id}</p>
+                    <p><strong>Table:</strong> ${orderData.table}</p>
+                    <p><strong>Name:</strong> ${orderData.name}</p>
+                    <p><strong>Total:</strong> $${orderData.total}</p>
+                    <p style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ddd;">
+                        <strong>⏰ Estimated:</strong> 15-20 minutes
+                    </p>
+                `;
+                
+                confirmation.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

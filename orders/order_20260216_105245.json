@@ -1,0 +1,25 @@
+{
+  "order_id": "20260216_105245",
+  "table": "1",
+  "customer_name": "kir",
+  "phone": "9875976058",
+  "items": [
+    {
+      "id": "p1",
+      "name": "Margherita Pizza",
+      "price": 12
+    },
+    {
+      "id": "p3",
+      "name": "Veggie Supreme Pizza",
+      "price": 13
+    },
+    {
+      "id": "d1",
+      "name": "Coke",
+      "price": 2
+    }
+  ],
+  "total": 27,
+  "timestamp": "2026-02-16T10:52:45.141423"
+}
