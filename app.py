@@ -1,12 +1,9 @@
 from flask import Flask, render_template, request, jsonify
-#from flask_cors import CORS
 import datetime
 import json
 import os
 
-#app = Flask(__name__)
-#CORS(app)
-
+app = Flask(__name__)
 # Restaurant Menu
 MENU = {
     "pizzas": [
